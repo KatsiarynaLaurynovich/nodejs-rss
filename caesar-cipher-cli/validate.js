@@ -1,8 +1,6 @@
 const fs = require('fs');
 const CONSTANTS = require('./constants');
 
-const MODULE_NAME = 'validate.js';
-
 const exit = process.exit;
 
 process.on('exit', code => console.log(`\nAbout to exit with code ${code}`));
@@ -14,7 +12,7 @@ module.exports = {
    */
   shiftValidator: value => {
     if (!Number.isInteger(parseInt(value, 10))) {
-      process.stderr.write(`${MODULE_NAME}, ${CONSTANTS.SHIFT_ERROR}`);
+      process.stderr.write(CONSTANTS.SHIFT_ERROR);
       exit(1);
     }
 
@@ -32,7 +30,7 @@ module.exports = {
       return type;
     }
 
-    process.stderr.write(`${MODULE_NAME}, ${CONSTANTS.ACTION_ERROR}`);
+    process.stderr.write(CONSTANTS.ACTION_ERROR);
     exit(1);
   },
 
@@ -43,7 +41,7 @@ module.exports = {
   inputValidator: path => {
     // eslint-disable-next-line no-sync
     if (fs.existsSync(path) === false) {
-      process.stderr.write(`${MODULE_NAME} ${CONSTANTS.INPUT_ERROR}`);
+      process.stderr.write(CONSTANTS.INPUT_ERROR);
       exit(1);
     }
 
@@ -57,7 +55,7 @@ module.exports = {
   outputValidator: path => {
     // eslint-disable-next-line no-sync
     if (fs.existsSync(path) === false) {
-      process.stderr.write(`${MODULE_NAME}, ${CONSTANTS.OUTPUT_ERROR}`);
+      process.stderr.write(CONSTANTS.OUTPUT_ERROR);
       exit(1);
     }
 

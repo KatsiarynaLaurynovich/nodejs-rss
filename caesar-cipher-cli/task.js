@@ -4,8 +4,6 @@ const streams = require('./streams');
 const validate = require('./validate');
 const CONSTANTS = require('./constants');
 
-const MODULE_NAME = 'task.js';
-
 const program = new commander.Command();
 program
   .version('0.0.1')
@@ -29,13 +27,17 @@ program
 
 const { action, shift, input, output } = program;
 
+if (typeof action === 'function') {
+  validate.actionValidator(action);
+}
+
 pipeline(
   streams.readStream(input),
   streams.transformStream(shift, action),
   streams.writeStream(output),
   err => {
     if (err) {
-      console.error(`${MODULE_NAME}, ${CONSTANTS.PIPELINE_ERROR}`, err);
+      console.error(CONSTANTS.PIPELINE_ERROR, err);
     } else {
       console.log(CONSTANTS.PIPELINE_SUCCESS);
     }
