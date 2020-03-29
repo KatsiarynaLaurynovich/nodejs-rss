@@ -3,23 +3,24 @@ const stream = require('stream');
 const { encrypt, decrypt } = require('./ceasar_cipher');
 const exit = process.exit;
 
-module.exports =  {
+module.exports = {
   /**
    * Creates readable stream
    *
    * @param {string} path
    * @return {ReadStream}
    */
-  readStream: (path) => {
-    if (path === undefined) { 
-      process.stdout.write(`Please type string to decode/encode: \n`);
+  readStream: path => {
+    if (path === undefined) {
+      process.stdout.write('Please type string to decode/encode: \n');
       process.stdin.setEncoding('utf-8');
-  
-      return process.stdin;
-    } 
 
+      return process.stdin;
+    }
+
+    // eslint-disable-next-line no-sync
     if (fs.existsSync(path) === false) {
-      process.stderr.write(`Input file does not exist. \n`);
+      process.stderr.write('Input file does not exist. \n');
       exit(1);
     }
 
@@ -32,13 +33,14 @@ module.exports =  {
    * @param {string} path
    * @return {WriteStream}
    */
-  writeStream: (path) => {
+  writeStream: path => {
     if (path === undefined) {
       return process.stdout;
-    } 
+    }
 
+    // eslint-disable-next-line no-sync
     if (fs.existsSync(path) === false) {
-      process.stderr.write(`Output file does not exist. \n`);
+      process.stderr.write('Output file does not exist. \n');
       exit(1);
     }
 
@@ -67,15 +69,13 @@ module.exports =  {
             data = decrypt(shift, chunk);
             break;
           default:
-            process.stderr.write('An error occured: Available options of action are "encode" or "decode" \n');
+            process.stderr.write(
+              'An error occured: Available options of action are "encode" or "decode" \n'
+            );
             exit(1);
-          
-            process.on('exit', function(code) {
-              return console.log(`About to exit with code ${code}`);
-            }); 
-          }
+        }
         done(null, data);
       }
     });
   }
-}
+};
