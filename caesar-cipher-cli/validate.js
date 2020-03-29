@@ -1,8 +1,11 @@
-const isNumber = value =>
-  typeof value === 'number' && value !== Infinity && value !== -Infinity;
+const fs = require('fs');
+const CONSTANTS = require('./constants');
+
+const MODULE_NAME = 'validate.js';
+
 const exit = process.exit;
 
-process.on('exit', code => console.log(`About to exit with code ${code}`));
+process.on('exit', code => console.log(`\nAbout to exit with code ${code}`));
 
 module.exports = {
   /**
@@ -10,8 +13,8 @@ module.exports = {
    * @return {number}
    */
   shiftValidator: value => {
-    if (!isNumber(parseInt(value, 10))) {
-      process.stderr.write('Please, pass number as a shift \n');
+    if (!Number.isInteger(parseInt(value, 10))) {
+      process.stderr.write(`${MODULE_NAME}, ${CONSTANTS.SHIFT_ERROR}`);
       exit(1);
     }
 
@@ -29,9 +32,35 @@ module.exports = {
       return type;
     }
 
-    process.stderr.write(
-      'An error occured: Available options of action are "encode" or "decode" \n'
-    );
+    process.stderr.write(`${MODULE_NAME}, ${CONSTANTS.ACTION_ERROR}`);
     exit(1);
+  },
+
+  /**
+   * @param {string} path
+   * @return {string}
+   */
+  inputValidator: path => {
+    // eslint-disable-next-line no-sync
+    if (fs.existsSync(path) === false) {
+      process.stderr.write(`${MODULE_NAME} ${CONSTANTS.INPUT_ERROR}`);
+      exit(1);
+    }
+
+    return path;
+  },
+
+  /**
+   * @param {string} path
+   * @return {string}
+   */
+  outputValidator: path => {
+    // eslint-disable-next-line no-sync
+    if (fs.existsSync(path) === false) {
+      process.stderr.write(`${MODULE_NAME}, ${CONSTANTS.OUTPUT_ERROR}`);
+      exit(1);
+    }
+
+    return path;
   }
 };

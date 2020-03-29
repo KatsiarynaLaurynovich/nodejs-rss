@@ -7,12 +7,13 @@ CLI tool will encode or decode a text by Caesar cipher
 CLI tool accepts 4 options:
 
 Required:
--s, --shift: a shift
--a, --action: an action encode/decode
+
+- -s || --shift: a shift 
+- -a || --action: an action encode/decode
 
 And optional:
--i, --input: an input file with string to encode or decode
--o, --output: an output file with encrypted string
+- -i || --input: an input file with string to encode or decode
+- -o || --output: an output file with encrypted string
 
 ## Prerequisites:
 
@@ -22,8 +23,10 @@ And optional:
 ## Downloading:
 
 ```bash
-git clone {repository URL}
+git clone git@github.com:KatsiarynaLaurynovich/nodejs-course-template.git
 ```
+
+and fo to caesar-cipher-cli directory
 
 ## Installing NPM modules:
 
@@ -32,6 +35,7 @@ npm install
 ```
 
 ## Running application: 
+In Caesar-cipher-cli directory run: 
 
 ```bash
 node task --shift <shift: is a number> --action <action: encode || decode> [--input <string: file name || STDIO>] [--output <string: file name || STDOUT>]

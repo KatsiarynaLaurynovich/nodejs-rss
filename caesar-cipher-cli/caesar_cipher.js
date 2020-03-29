@@ -1,3 +1,5 @@
+const { EOL } = require('os');
+
 module.exports = {
   /**
    * @param {number} shift
@@ -38,5 +40,5 @@ function caesar(shift, text) {
       output += text.charAt(i);
     }
   }
-  return output;
+  return `${output}${EOL}`;
 }
