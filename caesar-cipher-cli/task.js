@@ -5,6 +5,9 @@ const validate = require('./validate');
 const CONSTANTS = require('./constants');
 
 const program = new commander.Command();
+
+program.storeOptionsAsProperties(false);
+
 program
   .version('0.0.1')
   .requiredOption(
@@ -25,11 +28,7 @@ program
   )
   .parse(process.argv);
 
-const { action, shift, input, output } = program;
-
-if (typeof action === 'function') {
-  validate.actionValidator(action);
-}
+const { action, shift, input, output } = program.opts();
 
 pipeline(
   streams.readStream(input),

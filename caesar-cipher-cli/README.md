@@ -8,38 +8,29 @@ CLI tool accepts 4 options:
 
 Required:
 
-- -s || --shift: a shift 
-- -a || --action: an action encode/decode
+- -s, --shift: must be a number
+- -a, --action: allowed values "encode" or "decode"
 
 And optional:
-- -i || --input: an input file with string to encode or decode
-- -o || --output: an output file with encrypted string
+- -i, --input: an input file with string to encode or decode
+- -o, --output: an output file with encrypted string
 
 ## Prerequisites:
 
 - Git - Download & Install Git.
 - Node.js - Download & Install Node.js and the npm package manager.
 
-## Downloading:
+## Downloading and running app:
 
 ```bash
 git clone git@github.com:KatsiarynaLaurynovich/nodejs-course-template.git
-```
-
-and fo to caesar-cipher-cli directory
-
-## Installing NPM modules:
-
-```bash
+cd caesar-cipher-cli
 npm install
+node task -s [shift] -a [action] -i [inputPath] -o [outputPath] ||
+node task --shift [shift] --action [action] --input [inputPath] --output [outputPath]
+
 ```
 
-## Running application: 
-In Caesar-cipher-cli directory run: 
-
-```bash
-node task --shift <shift: is a number> --action <action: encode || decode> [--input <string: file name || STDIO>] [--output <string: file name || STDOUT>]
-```
 
 **Example:**
 

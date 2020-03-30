@@ -3,7 +3,19 @@ const CONSTANTS = require('./constants');
 
 const exit = process.exit;
 
-process.on('exit', code => console.log(`\nAbout to exit with code ${code}`));
+process.on('exit', code =>
+  console.log(`\nCLI is about to exit with code ${code}`)
+);
+
+const printError = error => {
+  process.stderr.write(error);
+  exit(1);
+};
+
+const isFileAbsent = path => {
+  // eslint-disable-next-line no-sync
+  return fs.existsSync(path) === false;
+};
 
 module.exports = {
   /**
@@ -12,8 +24,7 @@ module.exports = {
    */
   shiftValidator: value => {
     if (!Number.isInteger(parseInt(value, 10))) {
-      process.stderr.write(CONSTANTS.SHIFT_ERROR);
-      exit(1);
+      printError(CONSTANTS.SHIFT_TYPE_ERROR);
     }
 
     return parseInt(value, 10);
@@ -26,12 +37,11 @@ module.exports = {
   actionValidator: type => {
     const types = ['encode', 'decode'];
 
-    if (types.includes(type)) {
-      return type;
+    if (!types.includes(type)) {
+      printError(CONSTANTS.ACTION_TYPE_ERROR);
     }
 
-    process.stderr.write(CONSTANTS.ACTION_ERROR);
-    exit(1);
+    return type;
   },
 
   /**
@@ -39,10 +49,8 @@ module.exports = {
    * @return {string}
    */
   inputValidator: path => {
-    // eslint-disable-next-line no-sync
-    if (fs.existsSync(path) === false) {
-      process.stderr.write(CONSTANTS.INPUT_ERROR);
-      exit(1);
+    if (isFileAbsent(path)) {
+      printError(CONSTANTS.INPUT_ERROR);
     }
 
     return path;
@@ -53,10 +61,8 @@ module.exports = {
    * @return {string}
    */
   outputValidator: path => {
-    // eslint-disable-next-line no-sync
-    if (fs.existsSync(path) === false) {
-      process.stderr.write(CONSTANTS.OUTPUT_ERROR);
-      exit(1);
+    if (isFileAbsent(path)) {
+      printError(CONSTANTS.OUTPUT_ERROR);
     }
 
     return path;

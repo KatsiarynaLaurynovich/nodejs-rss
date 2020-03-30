@@ -1,10 +1,12 @@
 const fs = require('fs');
 const stream = require('stream');
-const { encrypt, decrypt } = require('./caesar_cipher');
+const { encrypt, decrypt } = require('./caesar-cipher-converter');
 const CONSTANTS = require('./constants');
 const exit = process.exit;
 
-const MODULE_NAME = 'streams.js';
+const isPathUndefined = path => {
+  return typeof path === 'undefined';
+};
 
 module.exports = {
   /**
@@ -14,8 +16,8 @@ module.exports = {
    * @return {ReadStream}
    */
   readStream: path => {
-    if (path === undefined) {
-      process.stdout.write(`${CONSTANTS.INPUT_PROMPT}`);
+    if (isPathUndefined(path)) {
+      process.stdout.write(CONSTANTS.INPUT_PROMPT);
       process.stdin.setEncoding('utf-8');
 
       return process.stdin;
@@ -31,19 +33,18 @@ module.exports = {
    * @return {WriteStream}
    */
   writeStream: path => {
-    if (path === undefined) {
+    if (isPathUndefined(path)) {
       return process.stdout;
     }
 
-    return fs.createWriteStream(path, { flags: 'a' }).on('access', data => {
-      console.log(data);
-    });
+    return fs.createWriteStream(path, { flags: 'a' });
   },
 
   /**
    * Creates transform stream
    *
-   * @param {string} path
+   * @param {number} shift
+   * @param {string} action
    * @return {module:stream.internal.Transform}
    */
   transformStream: (shift, action) => {
@@ -60,7 +61,7 @@ module.exports = {
             data = decrypt(shift, chunk);
             break;
           default:
-            process.stderr.write(`${MODULE_NAME}, ${CONSTANTS.ACTION_ERROR}`);
+            process.stderr.write(CONSTANTS.ACTION_TYPE_ERROR);
             exit(1);
         }
         done(null, data);
