@@ -1,43 +1,52 @@
 const fs = require('fs');
+const path = require('path');
 const stream = require('stream');
 const { encrypt, decrypt } = require('./caesar-cipher-converter');
 const CONSTANTS = require('./constants');
 const exit = process.exit;
 
-const isPathUndefined = path => {
-  return typeof path === 'undefined';
+const isPathUndefined = value => {
+  return typeof value === 'undefined';
+};
+
+const pathToFile = value => {
+  return value ? path.join(__dirname, value) : value;
 };
 
 module.exports = {
   /**
    * Creates readable stream
    *
-   * @param {string} path
+   * @param {string} value
    * @return {ReadStream}
    */
-  readStream: path => {
-    if (isPathUndefined(path)) {
+  readStream: value => {
+    const pathFile = pathToFile(value);
+
+    if (isPathUndefined(pathFile)) {
       process.stdout.write(CONSTANTS.INPUT_PROMPT);
       process.stdin.setEncoding('utf-8');
 
       return process.stdin;
     }
 
-    return fs.createReadStream(path, { encoding: 'utf-8' });
+    return fs.createReadStream(pathFile, { encoding: 'utf-8' });
   },
 
   /**
    * Creates writible stream
    *
-   * @param {string} path
+   * @param {string} value
    * @return {WriteStream}
    */
-  writeStream: path => {
-    if (isPathUndefined(path)) {
+  writeStream: value => {
+    const pathFile = pathToFile(value);
+
+    if (isPathUndefined(pathFile)) {
       return process.stdout;
     }
 
-    return fs.createWriteStream(path, { flags: 'a' });
+    return fs.createWriteStream(pathFile, { flags: 'a' });
   },
 
   /**
