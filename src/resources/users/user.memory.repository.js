@@ -17,22 +17,22 @@ const getAll = async () => {
   return data;
 };
 
-const createUser = async user => {
+const create = async user => {
   data.push(user);
 
   return user;
 };
 
-const updateUser = async (id, user) => {
+const update = async (id, user) => {
   const index = data.findIndex(i => i.id === id);
   data[index] = { id, ...user };
 
   return data[index];
 };
 
-const deleteUser = id => {
+const remove = id => {
   const i = data.findIndex(user => user.id === id);
   return data.splice(i, 1);
 };
 
-module.exports = { getAll, createUser, updateUser, deleteUser };
+module.exports = { getAll, create, update, remove };
