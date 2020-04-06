@@ -1,5 +1,3 @@
-const Task = require('./task.model');
-
 let data = [
   {
     id: '1',
@@ -42,10 +40,9 @@ const getByTaskId = async taskId => {
 };
 
 const create = async task => {
-  const a = new Task(task);
-  data.push(a);
+  data.push(task);
 
-  return a;
+  return task;
 };
 
 const update = async (id, task) => {

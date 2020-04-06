@@ -1,23 +1,39 @@
-const boardsRepository = require('./board.memory.repository');
-const taskRepository = require('../tasks/task.memory.repository');
+class BoardService {
+  constructor(boardsRepository, tasksRepository) {
+    this.boardsRepository = boardsRepository;
+    this.tasksRepository = tasksRepository;
+  }
 
-const getAll = () => boardsRepository.getAll();
-const getById = async id => await boardsRepository.getById(id);
+  getAll() {
+    return this.boardsRepository.getAll();
+  }
 
-const create = board => boardsRepository.create(board);
+  async getById(id) {
+    return this.boardsRepository.getById(id);
+  }
 
-const update = (id, board) => boardsRepository.update(id, board);
+  async create(board) {
+    return this.boardsRepository.create(board);
+  }
 
-const remove = async id => {
-  const tasks = await taskRepository.getAll();
+  async update(id, board) {
+    return this.boardsRepository.update(id, board);
+  }
 
-  tasks.map(async task => {
-    if (task.boardId === id) {
-      await taskRepository.remove(task.id);
-    }
-  });
+  async remove(id) {
+    this.removeRelatedTasks(id);
+    return this.boardsRepository.remove(id);
+  }
 
-  return boardsRepository.remove(id);
-};
+  async removeRelatedTasks(id) {
+    const tasks = await this.tasksRepository.getAll();
 
-module.exports = { getAll, getById, update, create, remove };
+    tasks.map(async task => {
+      if (task.boardId === id) {
+        await this.tasksRepository.remove(task.id);
+      }
+    });
+  }
+}
+
+module.exports = BoardService;

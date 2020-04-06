@@ -1,22 +1,28 @@
 const { body, param } = require('express-validator');
 
-module.exports = {
-  taskIdValidation: [
+const taskIdValidation = () => {
+  return [
     param('id')
       .not()
       .isEmpty()
       .trim()
       .escape()
-  ],
-  boardIdValidation: [
+  ];
+};
+
+const boardIdValidation = () => {
+  return [
     param('boardId')
       .not()
       .isEmpty()
       .isUUID()
       .trim()
       .escape()
-  ],
-  taskValidation: [
+  ];
+};
+
+const taskValidation = () => {
+  return [
     body('title')
       .not()
       .isEmpty()
@@ -35,5 +41,11 @@ module.exports = {
       .optional()
       .trim()
       .escape()
-  ]
+  ];
+};
+
+module.exports = {
+  taskIdValidation,
+  boardIdValidation,
+  taskValidation
 };

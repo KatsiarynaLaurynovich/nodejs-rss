@@ -1,29 +1,41 @@
-const usersRepository = require('./user.memory.repository');
-const taskRepository = require('../tasks/task.memory.repository');
+class UserService {
+  constructor(usersRepository, tasksRepository) {
+    this.usersRepository = usersRepository;
+    this.tasksRepository = tasksRepository;
+  }
 
-const getAll = () => usersRepository.getAll();
-const getById = async id => await usersRepository.getById(id);
+  getAll() {
+    return this.usersRepository.getAll();
+  }
 
-const create = user => usersRepository.create(user);
+  async getById(id) {
+    return this.usersRepository.getById(id);
+  }
 
-const update = (id, user) => usersRepository.update(id, user);
+  async create(user) {
+    return this.usersRepository.create(user);
+  }
 
-const remove = id => {
-  _updateTasks(id);
+  async update(id, user) {
+    return this.usersRepository.update(id, user);
+  }
 
-  return usersRepository.remove(id);
-};
+  async remove(id) {
+    await this.resetUserId(id);
+    return await this.usersRepository.remove(id);
+  }
 
-const _updateTasks = async userId => {
-  const tasks = await taskRepository.getAll();
+  async resetUserId(userId) {
+    const tasks = await this.tasksRepository.getAll();
 
-  tasks.map(async task => {
-    if (task.userId === userId) {
-      task.userId = null;
+    tasks.map(async task => {
+      if (task.userId === userId) {
+        task.userId = null;
 
-      await taskRepository.update(task);
-    }
-  });
-};
+        await this.tasksRepository.update(task);
+      }
+    });
+  }
+}
 
-module.exports = { getAll, getById, update, create, remove };
+module.exports = UserService;
