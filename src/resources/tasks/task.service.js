@@ -19,8 +19,6 @@ class TaskService {
   async create(boardId, task) {
     const board = await this.boardsRepository.getById(boardId);
 
-    console.log({ ...task, boardId: board.id });
-
     return this.tasksRepository.create({ ...task, boardId: board.id });
   }
 
