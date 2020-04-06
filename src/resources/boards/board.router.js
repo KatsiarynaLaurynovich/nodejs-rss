@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Board = require('./board.model');
 const boardsService = require('./board.service');
 const httpStatus = require('http-status');
-const { NOT_FOUND } = require('../../constants');
+const { NOT_FOUND, DELETED } = require('../../constants');
 
 router
   .route('/')
@@ -25,29 +25,25 @@ router
   .get(async (req, res) => {
     const result = await boardsService.getById(req.params.id);
 
-    if (result.length === 0) {
-      res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
     } else {
-      res.json(result[0]);
+      res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
     }
   })
   .put(async (req, res) => {
     const result = await boardsService.update(req.params.id, req.body);
 
     if (result) {
-      res.status(httpStatus.OK).json(result[0]);
+      res.status(httpStatus.OK).json(result);
     } else {
       res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
     }
   })
   .delete(async (req, res) => {
-    const result = await boardsService.remove(req.params.id);
+    await boardsService.remove(req.params.id);
 
-    if (result) {
-      res.status(httpStatus.OK).json(result);
-    } else {
-      res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
-    }
+    res.status(httpStatus.NO_CONTENT).json(DELETED);
   });
 
 module.exports = router;

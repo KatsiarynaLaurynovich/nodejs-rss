@@ -1,4 +1,4 @@
-const data = [
+let data = [
   {
     id: '1',
     name: 'name',
@@ -13,8 +13,10 @@ const data = [
   }
 ];
 
-const getAll = async () => {
-  return data;
+const getAll = () => data;
+
+const getById = async id => {
+  return data.find(user => user.id === id);
 };
 
 const create = async user => {
@@ -23,16 +25,19 @@ const create = async user => {
   return user;
 };
 
-const update = async (id, user) => {
-  const index = data.findIndex(i => i.id === id);
-  data[index] = { id, ...user };
+const update = async (id, userData) => {
+  const user = await getById(id);
+  const updatedUser = { ...user, ...userData };
 
-  return data[index];
+  data = data.map(u => {
+    return u.id === updatedUser.id ? updatedUser : u;
+  });
+
+  return updatedUser;
 };
 
 const remove = id => {
-  const i = data.findIndex(user => user.id === id);
-  return data.splice(i, 1);
+  data = data.filter(user => user.id !== id);
 };
 
-module.exports = { getAll, create, update, remove };
+module.exports = { getAll, getById, create, update, remove };

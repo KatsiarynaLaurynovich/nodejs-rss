@@ -1,29 +1,32 @@
-const data = [
+let data = [
   {
-    id: 'id',
+    id: '1',
     title: 'string',
     columns: [
       {
-        id: 'string',
+        id: '1',
         title: 'string',
         order: 0
       }
     ]
   },
   {
-    id: 'id1',
+    id: '2',
     title: 'string1',
     columns: [
       {
-        id: 'string1',
+        id: '2',
         title: 'string1',
         order: 0
       }
     ]
   }
 ];
-const getAll = async () => {
-  return data;
+
+const getAll = () => data;
+
+const getById = async id => {
+  return data.find(board => board.id === id);
 };
 
 const create = async board => {
@@ -32,16 +35,19 @@ const create = async board => {
   return board;
 };
 
-const update = async (id, board) => {
-  const index = data.findIndex(i => i.id === id);
-  data[index] = { id, ...board };
+const update = async (id, boardData) => {
+  const board = await getById(id);
+  const updatedBoard = { ...board, ...boardData };
 
-  return data[index];
+  data = data.map(b => {
+    return b.id === updatedBoard.id ? updatedBoard : b;
+  });
+
+  return updatedBoard;
 };
 
 const remove = id => {
-  const i = data.findIndex(board => board.id === id);
-  return data.splice(i, 1);
+  data = data.filter(board => board.id !== id);
 };
 
-module.exports = { getAll, create, update, remove };
+module.exports = { getAll, getById, create, update, remove };
