@@ -26,25 +26,20 @@ class UserService {
 
   async remove(id) {
     await this.updateUserId(id);
-    await this.usersRepository.remove(id);
-    // console.log(this.usersRepository.remove(id));
-    return true;
+    const result = await this.usersRepository.remove(id);
+
+    return result;
   }
 
   async updateUserId(userId) {
     const tasks = await this.tasksRepository.getAll();
-    // console.log('Before');
-    // console.log(tasks);
-    // console.log('-------');
+
     tasks.map(async task => {
       if (task.userId === userId) {
         task.userId = null;
         await this.tasksRepository.update(task);
       }
     });
-    // console.log('After');
-    // console.log(tasks);
-    // console.log('-------');
   }
 }
 

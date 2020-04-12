@@ -3,7 +3,6 @@ const { ErrorHandler } = require('../../helpers/error.handler');
 
 const tasksRepository = require('./task.memory.repository');
 const boardsRepository = require('../boards/board.memory.repository');
-
 const MESSAGES = require('./task.constants');
 
 const TasksService = require('./task.service');
@@ -12,6 +11,7 @@ const tasksService = new TasksService(tasksRepository, boardsRepository);
 const getAll = async (req, res, next) => {
   try {
     const result = await tasksService.getAllByBoardId(req.params.boardId);
+
     if (result) {
       res.status(httpStatus.OK).json(result);
     } else {
@@ -41,9 +41,6 @@ const getById = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   try {
-    if (Object.keys(req.body).length === 0) {
-      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
-    }
     const result = await tasksService.create(req.params.boardId, req.body);
 
     if (result) {
@@ -58,10 +55,6 @@ const create = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    console.log(Object.keys(req.body));
-    if (Object.keys(req.body).length === 0) {
-      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
-    }
     const result = await tasksService.update(
       req.params.id,
       req.params.boardId,

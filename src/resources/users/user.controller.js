@@ -3,7 +3,6 @@ const { ErrorHandler } = require('../../helpers/error.handler');
 
 const usersRepository = require('./user.memory.repository');
 const tasksRepository = require('../tasks/task.memory.repository');
-
 const MESSAGES = require('./user.constants');
 
 const UsersService = require('./user.service');
@@ -53,10 +52,6 @@ const create = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    if (Object.keys(req.body).length === 0) {
-      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
-    }
-
     const result = await usersService.update(req.params.id, req.body);
 
     if (result) {

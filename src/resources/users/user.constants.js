@@ -5,7 +5,7 @@ const MESSAGES = {
   BAD_REQUEST: 'An error occured. Bad request.',
   UPDATE_ERROR: 'An error occured. Can not update the user.',
   DELETE_SUCCESS: 'User has been deleted.',
-  UNAUTHORIZED: 'Access token is invalid'
+  UNAUTHORIZED: 'Access token is invalid.'
 };
 
 module.exports = MESSAGES;
