@@ -1,57 +1,95 @@
-const httpStatus = require('http-status');
+const httpStatus = require('http-status-codes');
+const { ErrorHandler } = require('../../helpers/error.handler');
 
 const tasksRepository = require('./task.memory.repository');
 const boardsRepository = require('../boards/board.memory.repository');
 
-const { NOT_FOUND, DELETED } = require('../../constants');
+const MESSAGES = require('./task.constants');
 
-const Task = require('./task.model');
 const TasksService = require('./task.service');
-
 const tasksService = new TasksService(tasksRepository, boardsRepository);
 
-const getAll = async (req, res) => {
-  const result = await tasksService.getAllByBoardId(req.params.boardId);
-
-  res.status(httpStatus.OK).json(result.map(Task.toResponse));
-};
-
-const getById = async (req, res) => {
-  const result = await tasksService.getByTaskId(req.params.id);
-
-  if (result) {
-    res.status(httpStatus.OK).json(Task.toResponse(result));
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+const getAll = async (req, res, next) => {
+  try {
+    const result = await tasksService.getAllByBoardId(req.params.boardId);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const create = async (req, res) => {
-  const result = await tasksService.create(
-    req.params.boardId,
-    new Task(req.body)
-  );
+const getById = async (req, res, next) => {
+  try {
+    const result = await tasksService.getByTaskId(
+      req.params.id,
+      req.params.boardId
+    );
 
-  if (result) {
-    res.status(httpStatus.OK).json(Task.toResponse(result));
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const update = async (req, res) => {
-  const result = await tasksService.update(req.params.id, req.body);
+const create = async (req, res, next) => {
+  try {
+    if (Object.keys(req.body).length === 0) {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
+    const result = await tasksService.create(req.params.boardId, req.body);
 
-  if (result) {
-    res.status(httpStatus.OK).json(result);
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const remove = async (req, res) => {
-  await tasksService.remove(req.params.id);
-  res.status(httpStatus.NO_CONTENT).json(DELETED);
+const update = async (req, res, next) => {
+  try {
+    console.log(Object.keys(req.body));
+    if (Object.keys(req.body).length === 0) {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
+    const result = await tasksService.update(
+      req.params.id,
+      req.params.boardId,
+      req.body
+    );
+
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+const remove = async (req, res, next) => {
+  try {
+    const result = await tasksService.remove(req.params.id);
+
+    if (result) {
+      res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
+    }
+  } catch (e) {
+    return next(e);
+  }
 };
 
 module.exports = {

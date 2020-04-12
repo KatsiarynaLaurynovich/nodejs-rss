@@ -1,3 +1,5 @@
+const Board = require('./board.model');
+
 class BoardService {
   constructor(boardsRepository, tasksRepository) {
     this.boardsRepository = boardsRepository;
@@ -12,17 +14,19 @@ class BoardService {
     return this.boardsRepository.getById(id);
   }
 
-  async create(board) {
+  async create(data) {
+    const board = new Board({ ...data });
     return this.boardsRepository.create(board);
   }
 
-  async update(id, board) {
+  async update(id, data) {
+    const board = new Board({ id, ...data });
     return this.boardsRepository.update(id, board);
   }
 
   async remove(id) {
-    this.removeRelatedTasks(id);
-    return this.boardsRepository.remove(id);
+    await this.removeRelatedTasks(id);
+    return await this.boardsRepository.remove(id);
   }
 
   async removeRelatedTasks(id) {
@@ -30,7 +34,7 @@ class BoardService {
 
     tasks.map(async task => {
       if (task.boardId === id) {
-        await this.tasksRepository.remove(task.id);
+        await this.tasksRepository.remove(task.id, id);
       }
     });
   }

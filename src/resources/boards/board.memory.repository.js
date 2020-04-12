@@ -1,53 +1,40 @@
-let data = [
-  {
-    id: '1',
-    title: 'string',
-    columns: [
-      {
-        id: '1',
-        title: 'string',
-        order: 0
-      }
-    ]
-  },
-  {
-    id: '2',
-    title: 'string1',
-    columns: [
-      {
-        id: '2',
-        title: 'string1',
-        order: 0
-      }
-    ]
-  }
-];
+let data = [];
 
-const getAll = () => data;
+const setData = boards => {
+  data = boards;
+};
+
+const getAll = async () => data;
 
 const getById = async id => {
-  return data.find(board => board.id === id);
+  const board = data.find(item => item.id === id);
+
+  return board ? board : undefined;
 };
 
 const create = async board => {
-  data.push(board);
+  setData([...data, board]);
 
   return board;
 };
 
-const update = async (id, boardData) => {
-  const board = await getById(id);
-  const updatedBoard = { ...board, ...boardData };
-
-  data = data.map(b => {
-    return b.id === updatedBoard.id ? updatedBoard : b;
+const getUpdatedBoards = board => {
+  return data.map(item => {
+    return item.id === board.id ? { ...item, ...board } : item;
   });
+};
 
-  return updatedBoard;
+const update = async (id, boardData) => {
+  setData(getUpdatedBoards(boardData));
+
+  return getById(id);
 };
 
 const remove = id => {
-  data = data.filter(board => board.id !== id);
+  const result = getById(id);
+  setData(data.filter(board => board.id !== id));
+
+  return result ? result : undefined;
 };
 
 module.exports = { getAll, getById, create, update, remove };

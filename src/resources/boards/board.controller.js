@@ -1,51 +1,89 @@
-const httpStatus = require('http-status');
+const httpStatus = require('http-status-codes');
+const { ErrorHandler } = require('../../helpers/error.handler');
 
-const { NOT_FOUND, DELETED } = require('../../constants');
+const MESSAGES = require('./borad.constants');
 const boardsRepository = require('./board.memory.repository');
 const tasksRepository = require('../tasks/task.memory.repository');
 
-const Board = require('./board.model');
 const BoardsService = require('./board.service');
 const boardsService = new BoardsService(boardsRepository, tasksRepository);
 
-const getAll = async (req, res) => {
-  const result = await boardsService.getAll();
-  res.status(httpStatus.OK).json(result);
-};
+const getAll = async (req, res, next) => {
+  try {
+    const result = await boardsService.getAll();
 
-const getById = async (req, res) => {
-  const result = await boardsService.getById(req.params.id);
-
-  if (result) {
-    res.status(httpStatus.OK).json(result);
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result.length) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const create = async (req, res) => {
-  const result = await boardsService.create(new Board({ ...req.body }));
+const getById = async (req, res, next) => {
+  try {
+    const result = await boardsService.getById(req.params.id);
 
-  if (result) {
-    res.status(httpStatus.OK).json(result);
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const update = async (req, res) => {
-  const result = await boardsService.update(req.params.id, req.body);
+const create = async (req, res, next) => {
+  try {
+    if (Object.keys(req.body).length === 0) {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
 
-  if (result) {
-    res.status(httpStatus.OK).json(result);
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    const result = await boardsService.create(req.body);
+
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const remove = async (req, res) => {
-  await boardsService.remove(req.params.id);
-  res.status(httpStatus.NO_CONTENT).json(DELETED);
+const update = async (req, res, next) => {
+  try {
+    if (Object.keys(req.body).length === 0) {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
+
+    const result = await boardsService.update(req.params.id, req.body);
+
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+const remove = async (req, res, next) => {
+  try {
+    const result = await boardsService.remove(req.params.id);
+
+    if (result) {
+      res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
+    }
+  } catch (e) {
+    return next(e);
+  }
 };
 
 module.exports = {

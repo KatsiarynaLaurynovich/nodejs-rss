@@ -1,60 +1,49 @@
-let data = [
-  {
-    id: '1',
-    title: 'string',
-    order: 0,
-    description: 'description',
-    userId: '1',
-    boardId: '1',
-    columnId: '1'
-  },
-  {
-    id: '2',
-    title: 'string',
-    order: 0,
-    description: 'description',
-    userId: '2',
-    boardId: '2',
-    columnId: '2'
-  },
-  {
-    id: '3',
-    title: 'string',
-    order: 0,
-    description: 'description',
-    userId: '2',
-    boardId: '1',
-    columnId: '1'
-  }
-];
+let data = [];
+
+const setData = tasks => {
+  data = tasks;
+};
 
 const getAll = () => data;
 
 const getAllByBoardId = async boardId => {
   const tasks = data.filter(task => task.boardId === boardId);
+
   return tasks;
 };
 
-const getByTaskId = async taskId => {
-  return data.find(task => task.id === taskId);
+const getByTaskId = async (taskId, boardId) => {
+  const task = data.find(
+    item => item.id === taskId && item.boardId === boardId
+  );
+
+  return task ? task : undefined;
 };
 
 const create = async task => {
-  data.push(task);
+  setData([...data, task]);
 
   return task;
 };
 
-const update = async (id, task) => {
-  const index = data.findIndex(i => i.id === id);
+const check = (id, task) => task.id === id;
 
-  data[index] = { ...data[index], ...task, ...{ id } };
+const getUpdatedTasks = item => {
+  return data.map(task => (check(task.id, task) ? { ...task, ...item } : task));
+};
+
+const update = async (id, boardId, taskData) => {
+  const index = data.findIndex(task => task.id === id);
+  setData(getUpdatedTasks(taskData));
 
   return data[index];
 };
 
-const remove = id => {
-  data = data.filter(task => task.id !== id);
+const remove = async id => {
+  const result = getByTaskId(id);
+  setData(data.filter(task => task.id !== id));
+
+  return result ? result : undefined;
 };
 
 module.exports = {

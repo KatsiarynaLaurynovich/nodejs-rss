@@ -14,14 +14,9 @@ class Task {
     this.title = title;
     this.order = order;
     this.description = description;
-    this.userId = userId;
+    this.userId = userId || null;
     this.boardId = boardId;
-    this.columnId = columnId;
-  }
-
-  static toResponse(task) {
-    const { id, title, order, description, userId } = task;
-    return { id, title, order, description, userId };
+    this.columnId = columnId || null;
   }
 }
 

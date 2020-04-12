@@ -1,43 +1,39 @@
-let data = [
-  {
-    id: '1',
-    name: 'name',
-    login: 'login',
-    password: 'password'
-  },
-  {
-    id: '2',
-    name: 'name2',
-    login: 'login2',
-    password: 'password'
-  }
-];
+const User = require('./user.model');
 
-const getAll = () => data;
+let data = [];
+
+const setData = users => {
+  data = users;
+};
+
+const getAll = async () => data.map(User.toResponse);
 
 const getById = async id => {
-  return data.find(user => user.id === id);
+  const user = data.find(item => item.id === id);
+  return user ? User.toResponse(user) : undefined;
 };
 
 const create = async user => {
-  data.push(user);
+  setData([...data, user]);
 
-  return user;
+  return User.toResponse(user);
+};
+
+const getUpdatedUsers = user => {
+  return data.map(item => (item.id === user.id ? { ...item, ...user } : item));
 };
 
 const update = async (id, userData) => {
-  const user = await getById(id);
-  const updatedUser = { ...user, ...userData };
+  setData(getUpdatedUsers(userData));
 
-  data = data.map(u => {
-    return u.id === updatedUser.id ? updatedUser : u;
-  });
-
-  return updatedUser;
+  return getById(id);
 };
 
 const remove = id => {
-  data = data.filter(user => user.id !== id);
+  const result = getById(id);
+  setData(data.filter(user => user.id !== id));
+
+  return result ? result : undefined;
 };
 
 module.exports = { getAll, getById, create, update, remove };

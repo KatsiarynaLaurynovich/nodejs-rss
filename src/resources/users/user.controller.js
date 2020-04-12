@@ -1,56 +1,85 @@
-const httpStatus = require('http-status');
+const httpStatus = require('http-status-codes');
+const { ErrorHandler } = require('../../helpers/error.handler');
 
 const usersRepository = require('./user.memory.repository');
 const tasksRepository = require('../tasks/task.memory.repository');
 
-const { NOT_FOUND, DELETED } = require('../../constants');
+const MESSAGES = require('./user.constants');
 
 const UsersService = require('./user.service');
-const User = require('./user.model');
-
 const usersService = new UsersService(usersRepository, tasksRepository);
 
-const getAll = async (req, res) => {
-  const result = await usersService.getAll();
-  res.status(httpStatus.OK).json(result.map(User.toResponse));
-};
+const getAll = async (req, res, next) => {
+  try {
+    const result = await usersService.getAll();
 
-const getById = async (req, res) => {
-  const result = await usersService.getById(req.params.id);
-
-  if (result) {
-    res.json(User.toResponse(result));
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const create = async (req, res) => {
-  const result = await usersService.create(new User({ ...req.body }));
+const getById = async (req, res, next) => {
+  try {
+    const result = await usersService.getById(req.params.id);
 
-  if (result) {
-    res.status(httpStatus.OK).json(User.toResponse(result));
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const update = async (req, res) => {
-  const result = await usersService.update(req.params.id, req.body);
+const create = async (req, res, next) => {
+  try {
+    const result = await usersService.create(req.body);
 
-  if (result) {
-    res.status(httpStatus.OK).json(User.toResponse(result));
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
-const remove = async (req, res) => {
-  if (await usersService.getById(req.params.id)) {
-    await usersService.remove(req.params.id);
-    res.status(httpStatus.OK).json(DELETED);
-  } else {
-    res.status(httpStatus.NOT_FOUND).json(NOT_FOUND);
+const update = async (req, res, next) => {
+  try {
+    if (Object.keys(req.body).length === 0) {
+      throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+    }
+
+    const result = await usersService.update(req.params.id, req.body);
+
+    if (result) {
+      res.status(httpStatus.OK).json(result);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+const remove = async (req, res, next) => {
+  try {
+    const result = await usersService.remove(req.params.id);
+
+    if (result) {
+      res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
+    } else {
+      throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
+    }
+  } catch (e) {
+    return next(e);
   }
 };
 
