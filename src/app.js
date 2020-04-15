@@ -42,18 +42,21 @@ app.use((err, req, res, next) => {
   next();
 });
 
-process
-  .on('uncaughtException', err => {
-    logger.error({
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      message: err.message
-    });
-  })
-  .on('unhandledRejection', reason => {
-    logger.error({
-      statCode: httpStatus.INTERNAL_SERVER_ERROR,
-      message: reason
-    });
+process.on('uncaughtException', err => {
+  logger.error({
+    statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+    message: err.message
   });
+
+  const exit = process.exit;
+  exit(1);
+});
+
+process.on('unhandledRejection', reason => {
+  logger.error({
+    statCode: httpStatus.INTERNAL_SERVER_ERROR,
+    message: reason
+  });
+});
 
 module.exports = app;
