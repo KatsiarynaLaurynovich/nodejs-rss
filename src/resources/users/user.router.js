@@ -1,9 +1,6 @@
 const router = require('express').Router();
 const userController = require('./user.controller');
-const {
-  userRequestValidation,
-  userIdValidation
-} = require('../../validators/user.validator');
+const { userRequestValidation, userIdValidation } = require('./user.validator');
 
 router
   .get('/', userController.getAll)

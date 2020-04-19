@@ -1,10 +1,7 @@
 const router = require('express').Router();
 const boardController = require('./board.controller');
 
-const {
-  boardIdValidation,
-  boardValidation
-} = require('../../validators/board.validator');
+const { boardIdValidation, boardValidation } = require('./board.validator');
 
 router
   .get('/', boardController.getAll)

@@ -3,7 +3,7 @@ const {
   taskIdValidation,
   taskValidation,
   boardIdValidation
-} = require('../../validators/task.validator');
+} = require('./task.validator');
 
 const taskController = require('./task.controller');
 
