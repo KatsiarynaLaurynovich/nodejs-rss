@@ -1,44 +1,30 @@
-const Task = require('./task.model');
-
 class TaskService {
-  constructor(tasksRepository, boardsRepository) {
-    this.tasksRepository = tasksRepository;
-    this.boardsRepository = boardsRepository;
+  constructor(taskRepository) {
+    this.taskRepository = taskRepository;
   }
 
-  getAll() {
-    return this.tasksRepository.getAll();
+  async getAll(boardId) {
+    return this.taskRepository.getAll(boardId);
   }
 
-  async getAllByBoardId(id) {
-    return await this.tasksRepository.getAll(id);
-  }
-
-  async getByTaskId(id, boardId) {
-    return await this.tasksRepository.getByTaskId(id, boardId);
+  async getByTaskId(boardId, taskId) {
+    return await this.taskRepository.getByTaskId(boardId, taskId);
   }
 
   async create(boardId, task) {
-    const taskModel = new Task({ ...task, ...{ boardId } });
-
-    return this.tasksRepository.create(taskModel);
+    return this.taskRepository.create(boardId, task);
   }
 
-  async update(id, boardId, task) {
-    const taskModel = new Task({
-      id,
-      boardId,
-      userId: task.userId,
-      title: task.title,
-      order: task.order,
-      description: task.description
-    });
-
-    return this.tasksRepository.update(id, boardId, taskModel);
+  async update(boardId, taskId, task) {
+    return this.taskRepository.update(boardId, taskId, task);
   }
 
-  async remove(id) {
-    return this.tasksRepository.remove(id);
+  async removeByTaskId(taskId) {
+    return this.taskRepository.removeByTaskId(taskId);
+  }
+
+  async removeByBoardId(boardId) {
+    return this.taskRepository.removeByBoardId(boardId);
   }
 }
 

@@ -1,15 +1,5 @@
 const { INTERNAL_SERVER_ERROR, getStatusText } = require('http-status-codes');
-const { createLogger, format, transports } = require('winston');
-
-const logger = createLogger({
-  transports: [
-    new transports.File({
-      filename: 'errors.log',
-      level: 'error',
-      format: format.combine(format.uncolorize(), format.json())
-    })
-  ]
-});
+const { logger } = require('./logger');
 
 class ErrorHandler extends Error {
   constructor(statusCode, message) {
@@ -37,4 +27,4 @@ function handleError(err, res) {
   res.status(INTERNAL_SERVER_ERROR).send(getStatusText(INTERNAL_SERVER_ERROR));
 }
 
-module.exports = { logger, ErrorHandler, handleError };
+module.exports = { ErrorHandler, handleError };
