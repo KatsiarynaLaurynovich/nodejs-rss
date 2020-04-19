@@ -1,94 +1,59 @@
-// const httpStatus = require('http-status-codes');
-// const { ErrorHandler } = require('../../helpers/error.handler');
+const httpStatus = require('http-status-codes');
+const MESSAGES = require('./task.constants');
 
-// const tasksRepository = require('./task.memory.repository');
-// const boardsRepository = require('../boards/board.memory.repository');
-// const MESSAGES = require('./task.constants');
+const { ErrorHandler } = require('../../helpers/error.handler');
+const catchErrors = require('../../helpers/catch.errors');
 
-// const TasksService = require('./task.service');
-// const tasksService = new TasksService(tasksRepository, boardsRepository);
+const taskRepository = require('./task.db.repository');
+const Task = require('./task.model');
+const TaskService = require('./task.service');
+const tasksService = new TaskService(taskRepository);
 
-// const getAll = async (req, res, next) => {
-//   try {
-//     const result = await tasksService.getAllByBoardId(req.params.boardId);
+const getAll = catchErrors(async (req, res) => {
+  const tasks = await tasksService.getAll();
+  return res.status(httpStatus.OK).json(tasks.map(Task.toResponse));
+});
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+const getById = catchErrors(async (req, res) => {
+  const task = await tasksService.getByTaskId(req.params.id);
 
-// const getById = async (req, res, next) => {
-//   try {
-//     const result = await tasksService.getByTaskId(
-//       req.params.id,
-//       req.params.boardId
-//     );
+  if (task) {
+    return res.status(httpStatus.OK).json(Task.toResponse(task));
+  }
+  throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
+});
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+const create = catchErrors(async (req, res) => {
+  const task = await tasksService.create(req.boardId, req.body);
 
-// const create = async (req, res, next) => {
-//   try {
-//     const result = await tasksService.create(req.params.boardId, req.body);
+  if (task) {
+    return res.status(httpStatus.OK).json(Task.toResponse(task));
+  }
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+  throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+});
 
-// const update = async (req, res, next) => {
-//   try {
-//     const result = await tasksService.update(
-//       req.params.id,
-//       req.params.boardId,
-//       req.body
-//     );
+const update = catchErrors(async (req, res) => {
+  const task = await tasksService.update(req.body);
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+  if (task) {
+    return res.status(httpStatus.OK).json(Task.toResponse(task));
+  }
+  throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
+});
 
-// const remove = async (req, res, next) => {
-//   try {
-//     const result = await tasksService.remove(req.params.id);
+const remove = catchErrors(async (req, res) => {
+  const message = await tasksService.removeByTaskId(req.params.id);
+  if (!message) {
+    throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
+  }
+  return res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
+});
 
-//     if (result) {
-//       res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
-//     } else {
-//       throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
-
-// module.exports = {
-//   getAll,
-//   getById,
-//   create,
-//   update,
-//   remove
-// };
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+};

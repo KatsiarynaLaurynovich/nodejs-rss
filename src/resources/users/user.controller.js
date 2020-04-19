@@ -1,87 +1,64 @@
-// const httpStatus = require('http-status-codes');
-// const { ErrorHandler } = require('../../helpers/error.handler');
+const httpStatus = require('http-status-codes');
+const MESSAGES = require('./user.constants');
 
-// const usersRepository = require('./user.memory.repository');
-// const tasksRepository = require('../tasks/task.memory.repository');
-// const MESSAGES = require('./user.constants');
+const { ErrorHandler } = require('../../helpers/error.handler');
+const catchErrors = require('../../helpers/catch.errors');
 
-// const UsersService = require('./user.service');
-// const usersService = new UsersService(usersRepository, tasksRepository);
+const userRepository = require('./user.db.repository');
+const taskRepository = require('../tasks/task.db.repository');
+const UserService = require('./user.service');
+const User = require('./user.model');
 
-// const getAll = async (req, res, next) => {
-//   try {
-//     const result = await usersService.getAll();
+const usersService = new UserService(userRepository, taskRepository);
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+const getAll = catchErrors(async (req, res) => {
+  const users = await usersService.getAll();
 
-// const getById = async (req, res, next) => {
-//   try {
-//     const result = await usersService.getById(req.params.id);
+  return res.status(httpStatus.OK).json(users.map(User.toResponse));
+});
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+const getById = catchErrors(async (req, res) => {
+  const user = await usersService.getById(req.params.id);
+  if (user) {
+    return res.status(httpStatus.OK).json(User.toResponse(user));
+  }
+  throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
+});
 
-// const create = async (req, res, next) => {
-//   try {
-//     const result = await usersService.create(req.body);
+const create = catchErrors(async (req, res) => {
+  const user = await usersService.create(req.body);
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+  if (user) {
+    res.status(httpStatus.OK).json(User.toResponse(user));
+  } else {
+    throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+  }
+});
 
-// const update = async (req, res, next) => {
-//   try {
-//     const result = await usersService.update(req.params.id, req.body);
+const update = catchErrors(async (req, res) => {
+  const isUser = await usersService.getById(req.params.id);
+  if (!isUser) {
+    throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
+  }
+  const user = await usersService.update(req.body);
 
-//     if (result) {
-//       res.status(httpStatus.OK).json(result);
-//     } else {
-//       throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+  return res.status(httpStatus.OK).json(user);
+});
 
-// const remove = async (req, res, next) => {
-//   try {
-//     const result = await usersService.remove(req.params.id);
+const remove = catchErrors(async (req, res) => {
+  const message = await usersService.remove(req.params.id);
 
-//     if (result) {
-//       res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
-//     } else {
-//       throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
-//     }
-//   } catch (e) {
-//     return next(e);
-//   }
-// };
+  if (message) {
+    res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
+  } else {
+    throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
+  }
+});
 
-// module.exports = {
-//   getAll,
-//   getById,
-//   create,
-//   update,
-//   remove
-// };
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+};

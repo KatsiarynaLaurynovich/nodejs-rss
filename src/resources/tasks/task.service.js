@@ -3,20 +3,20 @@ class TaskService {
     this.taskRepository = taskRepository;
   }
 
-  async getAll(boardId) {
-    return this.taskRepository.getAll(boardId);
+  async getAll() {
+    return this.taskRepository.getAll();
   }
 
-  async getByTaskId(boardId, taskId) {
-    return await this.taskRepository.getByTaskId(boardId, taskId);
+  async getByTaskId(taskId) {
+    return await this.taskRepository.getByTaskId(taskId);
   }
 
   async create(boardId, task) {
     return this.taskRepository.create(boardId, task);
   }
 
-  async update(boardId, taskId, task) {
-    return this.taskRepository.update(boardId, taskId, task);
+  async update(task) {
+    return this.taskRepository.update(task);
   }
 
   async removeByTaskId(taskId) {

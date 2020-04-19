@@ -5,6 +5,7 @@ const YAML = require('yamljs');
 const httpStatus = require('http-status-codes');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
+const taskRouter = require('./resources/tasks/task.router');
 
 const morgan = require('morgan');
 const { handleError } = require('./helpers/error.handler');
@@ -33,6 +34,15 @@ app.use('/', (req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
+
+boardRouter.use(
+  '/:boardId/tasks',
+  (req, res, next) => {
+    req.boardId = req.params.boardId;
+    next();
+  },
+  taskRouter
+);
 
 app.use((err, req, res, next) => {
   handleError(err, res);

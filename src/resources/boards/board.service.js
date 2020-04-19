@@ -16,8 +16,8 @@ class BoardService {
     return this.boardRepository.create(board);
   }
 
-  async update(id, board) {
-    return this.boardRepository.update(id, board);
+  async update(board) {
+    return this.boardRepository.update(board);
   }
 
   async remove(id) {

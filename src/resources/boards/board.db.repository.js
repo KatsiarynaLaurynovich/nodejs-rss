@@ -12,7 +12,7 @@ const create = async board => {
   return Board.create(board);
 };
 
-const update = async (id, board) => {
+const update = async board => {
   return Board.updateOne({ _id: board.id }, board);
 };
 

@@ -30,17 +30,7 @@ const taskValidation = () => {
       .escape(),
     body('order')
       .optional()
-      .isInt(),
-    body('title')
-      .optional()
-      .not()
-      .isEmpty()
-      .trim()
-      .escape(),
-    body(['userId', 'columnId'])
-      .optional()
-      .trim()
-      .escape()
+      .isInt()
   ];
 };
 

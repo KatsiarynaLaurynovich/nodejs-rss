@@ -12,7 +12,7 @@ const create = async user => {
   return User.create(user);
 };
 
-const update = async (id, user) => {
+const update = async user => {
   return User.updateOne({ _id: user.id }, user);
 };
 

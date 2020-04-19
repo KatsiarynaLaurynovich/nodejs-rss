@@ -1,11 +1,10 @@
 const Task = require('./task.model');
 
-const getAll = async boardId => {
-  console.log(boardId);
+const getAll = async () => {
   return Task.find({});
 };
 
-const getByTaskId = async (boardId, taskId) => {
+const getByTaskId = async taskId => {
   return Task.findById(taskId);
 };
 
@@ -13,7 +12,7 @@ const create = async (boardId, task) => {
   return Task.create({ ...task, boardId });
 };
 
-const update = async (boardId, taskId, task) => {
+const update = async task => {
   return Task.updateOne({ _id: task.id }, task);
 };
 

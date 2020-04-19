@@ -1,77 +1,62 @@
-// const httpStatus = require('http-status-codes');
-// const { ErrorHandler } = require('../../helpers/error.handler');
+const httpStatus = require('http-status-codes');
+const MESSAGES = require('./board.constants');
 
-// const catchErrors = require('../../common/catchErrors');
+const { ErrorHandler } = require('../../helpers/error.handler');
+const catchErrors = require('../../helpers/catch.errors');
 
-// const MESSAGES = require('./borad.constants');
-// const boardRepository = require('./board.memory.repository');
-// const taskRepository = require('../tasks/task.memory.repository');
+const boardRepository = require('./board.db.repository');
+const taskRepository = require('../tasks/task.db.repository');
+const Board = require('./board.model');
+const BoardService = require('./board.service');
+const boardsService = new BoardService(boardRepository, taskRepository);
 
-// const BoardService = require('./board.service');
-// const boardsService = new BoardService(boardRepository, taskRepository);
+const getAll = catchErrors(async (req, res) => {
+  const boards = await boardsService.getAll();
+  return res.status(httpStatus.OK).json(boards.map(Board.toResponse));
+});
 
-// const getAll = async (req, res, next) => {
-//   catchErrors(async (req, res) => {
-//     const boards = await boardsService.getAll();
+const getById = catchErrors(async (req, res) => {
+  const board = await boardsService.getById(req.params.id);
+  if (board) {
+    return res.status(httpStatus.OK).json(Board.toResponse(board));
+  }
 
-//     if (boards.length) {
-//       return res.status(httpStatus.OK).json(boards);
-//     }
+  throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
+});
 
-//     throw new ErrorHandler(httpStatus.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
-//   });
-// };
+const create = catchErrors(async (req, res) => {
+  const board = await boardsService.create(req.body);
 
-// const getById = async (req, res, next) => {
-//   catchErrors(async (req, res) => {
-//     const board = await boardsService.getById(req.params.id);
-//     if (board) {
-//       return res.status(httpStatus.OK).json(board);
-//     }
+  if (board) {
+    return res.status(httpStatus.OK).json(Board.toResponse(board));
+  }
 
-//     throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.NOT_FOUND);
-//   });
-// };
+  throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
+});
 
-// const create = async (req, res, next) => {
-//   catchErrors(async (req, res) => {
-//     const board = await boardsService.create(req.body);
+const update = catchErrors(async (req, res) => {
+  const board = await boardsService.update(req.body);
 
-//     if (board) {
-//       return res.status(httpStatus.OK).json(board);
-//     }
+  if (board) {
+    return res.status(httpStatus.OK).json(Board.toResponse(board));
+  }
+  throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
+});
 
-//     throw new ErrorHandler(httpStatus.BAD_REQUEST, MESSAGES.BAD_REQUEST);
-//   })
-// };
+const remove = catchErrors(async (req, res) => {
+  const result = await boardsService.remove(req.params.id);
 
-// const update = async (req, res, next) => {
-//   catchErrors(async (req, res) => {
-//     const board = await boardsService.update(req.params.id, req.body);
+  if (result) {
+    return res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
+  }
 
-//     if (board) {
-//       return res.status(httpStatus.OK).json(board);
-//     }
-//     throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.UPDATE_ERROR);
-//   });
-// };
+  throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
+});
 
-// const remove = async (req, res, next) => {
-//   catchErrors(async (req, res) => {
-//     const result = await boardsService.remove(req.params.id);
-
-//     if (result) {
-//       return res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);
-//     }
-
-//     throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
-//   });
-// };
-
-// module.exports = {
-//   getAll,
-//   getById,
-//   create,
-//   update,
-//   remove
-// };
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  remove
+};
