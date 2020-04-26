@@ -4,19 +4,16 @@ const MESSAGES = require('./board.constants');
 const { ErrorHandler } = require('../../helpers/error.handler');
 const catchErrors = require('../../helpers/catch.errors');
 
-const boardRepository = require('./board.db.repository');
-const taskRepository = require('../tasks/task.db.repository');
 const Board = require('./board.model');
-const BoardService = require('./board.service');
-const boardsService = new BoardService(boardRepository, taskRepository);
+const boardService = require('./board.service');
 
 const getAll = catchErrors(async (req, res) => {
-  const boards = await boardsService.getAll();
+  const boards = await boardService.getAll();
   return res.status(httpStatus.OK).json(boards.map(Board.toResponse));
 });
 
 const getById = catchErrors(async (req, res) => {
-  const board = await boardsService.getById(req.params.id);
+  const board = await boardService.getById(req.params.id);
   if (board) {
     return res.status(httpStatus.OK).json(Board.toResponse(board));
   }
@@ -25,7 +22,7 @@ const getById = catchErrors(async (req, res) => {
 });
 
 const create = catchErrors(async (req, res) => {
-  const board = await boardsService.create(req.body);
+  const board = await boardService.create(req.body);
 
   if (board) {
     return res.status(httpStatus.OK).json(Board.toResponse(board));
@@ -35,7 +32,7 @@ const create = catchErrors(async (req, res) => {
 });
 
 const update = catchErrors(async (req, res) => {
-  const board = await boardsService.update(req.body);
+  const board = await boardService.update(req.body);
 
   if (board) {
     return res.status(httpStatus.OK).json(Board.toResponse(board));
@@ -44,7 +41,7 @@ const update = catchErrors(async (req, res) => {
 });
 
 const remove = catchErrors(async (req, res) => {
-  const result = await boardsService.remove(req.params.id);
+  const result = await boardService.remove(req.params.id);
 
   if (result) {
     return res.status(httpStatus.NO_CONTENT).json(MESSAGES.DELETE_SUCCESS);

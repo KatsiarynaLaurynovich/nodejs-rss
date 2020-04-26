@@ -4,18 +4,16 @@ const MESSAGES = require('./task.constants');
 const { ErrorHandler } = require('../../helpers/error.handler');
 const catchErrors = require('../../helpers/catch.errors');
 
-const taskRepository = require('./task.db.repository');
 const Task = require('./task.model');
-const TaskService = require('./task.service');
-const tasksService = new TaskService(taskRepository);
+const taskService = require('./task.service');
 
 const getAll = catchErrors(async (req, res) => {
-  const tasks = await tasksService.getAll();
+  const tasks = await taskService.getAll();
   return res.status(httpStatus.OK).json(tasks.map(Task.toResponse));
 });
 
 const getById = catchErrors(async (req, res) => {
-  const task = await tasksService.getByTaskId(req.params.id);
+  const task = await taskService.getByTaskId(req.params.id);
 
   if (task) {
     return res.status(httpStatus.OK).json(Task.toResponse(task));
@@ -24,7 +22,7 @@ const getById = catchErrors(async (req, res) => {
 });
 
 const create = catchErrors(async (req, res) => {
-  const task = await tasksService.create(req.boardId, req.body);
+  const task = await taskService.create(req.boardId, req.body);
 
   if (task) {
     return res.status(httpStatus.OK).json(Task.toResponse(task));
@@ -34,7 +32,7 @@ const create = catchErrors(async (req, res) => {
 });
 
 const update = catchErrors(async (req, res) => {
-  const task = await tasksService.update(req.body);
+  const task = await taskService.update(req.body);
 
   if (task) {
     return res.status(httpStatus.OK).json(Task.toResponse(task));
@@ -43,7 +41,7 @@ const update = catchErrors(async (req, res) => {
 });
 
 const remove = catchErrors(async (req, res) => {
-  const message = await tasksService.removeByTaskId(req.params.id);
+  const message = await taskService.removeByTaskId(req.params.id);
   if (!message) {
     throw new ErrorHandler(httpStatus.NOT_FOUND, MESSAGES.DELETE_ERROR);
   }

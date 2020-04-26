@@ -1,6 +1,4 @@
 /* eslint-disable require-atomic-updates */
-const { hashPassword } = require('../login/login.service');
-
 class UserService {
   constructor(userRepository, taskRepository) {
     this.userRepository = userRepository;
@@ -16,8 +14,6 @@ class UserService {
   }
 
   async create(user) {
-    const hashedPwd = await hashPassword(user.password);
-    user.password = hashedPwd;
     return this.userRepository.create(user);
   }
 
@@ -31,4 +27,7 @@ class UserService {
   }
 }
 
-module.exports = UserService;
+module.exports = new UserService(
+  require('./user.db.repository'),
+  require('../tasks/task.db.repository')
+);

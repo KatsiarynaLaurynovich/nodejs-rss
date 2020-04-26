@@ -26,4 +26,7 @@ class BoardService {
   }
 }
 
-module.exports = BoardService;
+module.exports = new BoardService(
+  require('./board.db.repository'),
+  require('../tasks/task.db.repository')
+);

@@ -12,14 +12,18 @@ const verifyPassword = async (password, hash) => {
   return bcrypt.compare(password, hash);
 };
 
+const createJwt = async payload => {
+  return jwt.sign(payload, JWT_SECRET_KEY, {
+    expiresIn: '24h'
+  });
+};
+
 const getJWTToken = async data => {
   const { login, password } = data;
   const user = await userRepository.getByLogin(login);
 
   if (user && verifyPassword(password, user.password)) {
-    return jwt.sign({ userId: user.id, login }, JWT_SECRET_KEY, {
-      expiresIn: '24h'
-    });
+    return createJwt({ userId: user.id, login });
   }
   return null;
 };

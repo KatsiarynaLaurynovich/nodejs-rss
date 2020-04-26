@@ -28,4 +28,4 @@ class TaskService {
   }
 }
 
-module.exports = TaskService;
+module.exports = new TaskService(require('./task.db.repository'));
