@@ -32,7 +32,7 @@ UserSchema.statics.toResponse = user => {
   return { id, name, login };
 };
 
-UserSchema.pre('save', async function myFunc(next) {
+UserSchema.pre('save', async function hashPassword(next) {
   const user = this;
 
   if (user.isModified('password')) {
