@@ -6,6 +6,9 @@ const httpStatus = require('http-status-codes');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
+const loginRouter = require('./resources/login/login.router');
+
+const isAuthenticated = require('./middleware/auth');
 
 const morgan = require('morgan');
 const { handleError } = require('./helpers/error.handler');
@@ -32,8 +35,10 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-app.use('/users', userRouter);
-app.use('/boards', boardRouter);
+app.use('/login', loginRouter);
+app.use('/users', isAuthenticated, userRouter);
+app.use('/boards', isAuthenticated, boardRouter);
+app.use('/tasks', isAuthenticated);
 
 boardRouter.use(
   '/:boardId/tasks',
